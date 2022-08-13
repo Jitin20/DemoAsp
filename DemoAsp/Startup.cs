@@ -33,15 +33,33 @@ namespace DemoAsp
             }
 
             app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
+            app.Use(async (context, next) =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync($"Company = {config["MyCompanyName"]}");
-                  //      +System.Diagnostics.Process.GetCurrentProcess().ProcessName);
-                });
+                await context.Response.WriteAsync("Middleware1: incoming request \n ");
+                await next();
+                await context.Response.WriteAsync("Middleware1: outgoing request \n");
+
             });
+            app.Use(async (context, next) =>
+            {
+                await context.Response.WriteAsync("Middleware2: incoming request \n ");
+                await next();
+                await context.Response.WriteAsync("Middleware2: outgoing request \n");
+
+            });
+            app.Run(async (context) =>
+            {
+                await context.Response.WriteAsync("Middleware3: incoming request and request generated \n ");
+
+            });
+            //  app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapGet("/", async context =>
+            //    {
+            //        await context.Response.WriteAsync($"Company = {config["MyCompanyName"]}");
+            //      //      +System.Diagnostics.Process.GetCurrentProcess().ProcessName);
+            //    });
+            //});
         }
     }
 }
